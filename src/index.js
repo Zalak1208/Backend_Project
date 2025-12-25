@@ -4,8 +4,9 @@ import connectDB from "./db/index.js"
 import {app} from "./app.js"
 
 dotenv.config({
-    path: './env'
+    path: './.env'
 })
+// console.log("MONGODB_URI =", process.env.MONGODB_URI)
 
 app.on("error", (error) => {
     console.log("ERROR:", error);
