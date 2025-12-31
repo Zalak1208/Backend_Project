@@ -1,0 +1,59 @@
+// how to get publicId from the Cloudinary Url?
+// cloudinary stores images/ media with its unique Id
+// Note : url ----> https://res.cloudinary.com/demo/image/upload/v1712345678/users/avatar_abcd123.jpg
+// publicId ----> users/avatar_abcd123 
+
+
+import { ApiError } from "./apiErrors";
+
+const getCloudinaryPublicId = async (url) => {
+  if (!url) {
+    throw new ApiError(400, "Cloudinary URL is required");
+  }
+
+  try {
+    const parts = url.split("/"); // returns array of all the elements of url seperated by "/"
+    //   https://res.cloudinary.com/demo/image/upload/v12345/users/avatar_abc.jpg
+    //   [
+    //   "https:",
+    //   "",
+    //   "res.cloudinary.com",
+    //   "demo",
+    //   "image",
+    //   "upload",
+    //   "v12345",
+    //   "users",
+    //   "avatar_abc.jpg"
+    // ]
+  
+    const uploadIndex = parts.indexOf("upload");
+    // upload is the keypoint, everything afterUpload belongs to the file path
+    if (uploadIndex === -1) {
+      throw new ApiError(400, "Invalid Cloudinary URL format");
+    }
+  
+    const filename = parts.pop(); // avatar_abc.jpg
+    // removes last part of url, filename with extension
+  
+    if (!filename || !filename.includes(".")) {
+      // validate the filename
+      throw new ApiError(400, "Invalid Cloudinary file name");
+    }
+  
+    const folderPath = parts
+      .slice(uploadIndex + 2) // extract the part or the data at the index given, this will give ["users"]
+      .join("/"); //join() combines all elements of an array into a single string, using a separator you choose. this will give "users"
+  
+    if (!folderPath) {
+      throw new ApiError(400, "Cloudinary folder path missing in URL");
+    }
+  
+    const publicId = `${folderPath}/${filename.split(".")[0]}`;
+  
+    return publicId;
+  } catch (error) {
+    throw new ApiError(500, "Failed to extract Cloudinary public_id from URL")
+  }
+};
+
+export { getCloudinaryPublicId };
