@@ -4,7 +4,7 @@
 // publicId ----> users/avatar_abcd123 
 
 
-import { ApiError } from "./apiErrors";
+import { ApiError } from "./apiErrors.js";
 
 const getCloudinaryPublicId = async (url) => {
   if (!url) {
